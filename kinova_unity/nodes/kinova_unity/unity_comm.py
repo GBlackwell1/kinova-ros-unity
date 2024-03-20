@@ -26,7 +26,7 @@ def unity_callback(msg):
         print("Calling service to home "+msg.data)
         #rospy.wait_for_service('/m1n6s300_driver/in/home_arm')
         #rospy.ServiceProxy('/m1n6s300_driver/in/home_arm', HomeArm)
-    else: # message is movement
+    else: # message is homing movement
         global degs
         degs = msg.data.split(':')
         for i in range(0,6):
@@ -76,8 +76,6 @@ if __name__=='__main__':
     rate=rospy.Rate(100)
 
     while not rospy.is_shutdown():
-         
-
         # stop continuously sending data 
         rate.sleep()
 		
