@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  actionlib_msgs
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -68,8 +69,8 @@ catkin_python_setup()
 
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   kinova_msgs#   std_msgs
+  # DEPENDENCIES
+  # geometry_msgs kinova_msgs std_msgs actionlib_msgs
 # )
 
 ################################################
@@ -104,7 +105,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES kinova_unity
-  CATKIN_DEPENDS geometry_msgs kinova_driver kinova_msgs roscpp rospy std_msgs
+  CATKIN_DEPENDS geometry_msgs kinova_driver kinova_msgs actionlib_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
 
