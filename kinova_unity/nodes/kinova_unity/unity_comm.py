@@ -120,7 +120,9 @@ def outgoing_callback(msg):
             data = "false:"+status_text
         else: # SUCCEEDED: Finished movement goal
             data = "true:"+status_text
+	print("Data being sent to /kinova_outgoing: "+data)
         outgoing_kinova.publish(data)
+    # TODO: Remove the publishing here and the constant printing, only print when published
     outgoing_kinova.publish(str(status))
     print(str(status)+" is the current status")
 
@@ -129,7 +131,7 @@ if __name__=='__main__':
     rospy.init_node('kinova_unity') 
     # Subscribe to incoming unity messages from rosbridge
     global outgoing_kinova
-    outgoing_kinova = rospy.Publisher('kinova_outgoing', String, queue_size=[10])
+    outgoing_kinova = rospy.Publisher('kinova_outgoing', String, queue_size=10)
     incoming_unity = rospy.Subscriber('/unity_incoming', String, unity_callback)  
     robot_status = rospy.Subscriber('/'+robot_name+'/joints_action/joint_angles/status', GoalStatusArray, outgoing_callback)
     rate = rospy.Rate(100)
