@@ -8,6 +8,7 @@ import actionlib
 import os
 #remove or add the message type
 from std_msgs.msg import String, Float32, Bool, Float32MultiArray
+from kinova_msgs.msg import ArmJointAnglesActionResult
 from kinova_msgs.msg import ArmJointAnglesAction
 from kinova_msgs.msg import ArmJointAnglesGoal
 from kinova_msgs.msg import JointAngles
@@ -107,24 +108,16 @@ def setCurrentState(msg):
 # CHECK IT PIMPS: all msg codes are under actionlib_msgs/GoalStatus.msg
 def outgoing_callback(msg):
     # Get GoalStatus MSG from index 1, then get the actual uint8 status code
-    status_list = msg.status_list
-    # get actual data to send, false = noninteractable, true = interactable
+    status_list = msg.status
+    status = status_list.status
+    header = msg.header
+    seq_num = header.seq
     if not status_list:
         return
-    status_temp = status_list[0]
-    status_text = status_temp.text
-    status = status_temp.status
-
-    if status != curr_status:
-        if status == 1: # ACTIVE: Working towards the goal
-            data = "false:"+status_text
-        else: # SUCCEEDED: Finished movement goal
-            data = "true:"+status_text
-	print("Data being sent to /kinova_outgoing: "+data)
-        outgoing_kinova.publish(data)
-    # TODO: Remove the publishing here and the constant printing, only print when published
-    outgoing_kinova.publish(str(status))
-    print(str(status)+" is the current status")
+    # Print and send
+    print("Data being sent to /kinova_outgoing: "+str(seq_num)+":"+str(status))
+    data = str(seq_num)+":"+str(status)
+    outgoing_kinova.publish(data)
 
 if __name__=='__main__':
     #Add here the name of the ROS. In ROS, names are unique named.
@@ -133,7 +126,7 @@ if __name__=='__main__':
     global outgoing_kinova
     outgoing_kinova = rospy.Publisher('kinova_outgoing', String, queue_size=10)
     incoming_unity = rospy.Subscriber('/unity_incoming', String, unity_callback)  
-    robot_status = rospy.Subscriber('/'+robot_name+'/joints_action/joint_angles/status', GoalStatusArray, outgoing_callback)
+    robot_status = rospy.Subscriber('/'+robot_name+'/joints_action/joint_angles/result', ArmJointAnglesActionResult, outgoing_callback)
     rate = rospy.Rate(100)
 
     while not rospy.is_shutdown():
