@@ -33,8 +33,8 @@ def sendCommand(msg, relative):
 
     if relative:
         print('Relative move received...')
+        #getCurrentState()
         print(msg)
-        getCurrentState()
         goal.angles.joint1 = msg[0]+robot_state[0]
         goal.angles.joint2 = msg[1]+robot_state[1]
         goal.angles.joint3 = msg[2]+robot_state[2]
@@ -88,21 +88,28 @@ def unity_callback(msg):
         print(received_movement, sep=",")
         sendCommand(received_movement, True)
 
-def getCurrentState():
-    topic_address = '/'+robot_name+'/out/joint_command'
-    rospy.Subscriber(topic_address, JointAngles, setCurrentState)
-    # Get positions of all of current joints
-    rospy.wait_for_message(topic_address, JointAngles)
-    print('Current robot state received from listener')
+#def getCurrentState():
+ #   topic_address = '/'+robot_name+'/out/joint_command'
+  #  rospy.Subscriber(topic_address, JointAngles, setCurrentState)
+   # # Get positions of all of current joints
+    #rospy.wait_for_message(topic_address, JointAngles)
+    #print('Current robot state received from listener')
 
 def setCurrentState(msg):
     global robot_state
+    robot_state_string = ""
     robot_state.clear()
     currentState_arr = str(msg).split("\n")
     for index in range(0,len(currentState_arr)):
         # Do some funky python parsing to get just joint
         temp = currentState_arr[index].split(": ")
         robot_state.append(float(temp[1]))
+        if index < len(currentState_arr)-1:
+            robot_state_string += temp[1]+":"
+        else:
+            robot_state_string += temp[1]
+    # Publish formatted state for unity
+    outgoing_jointcmd.publish(robot_state_string)
 
 # This is used to send robot status back to unity
 # CHECK IT PIMPS: all msg codes are under actionlib_msgs/GoalStatus.msg
@@ -124,7 +131,13 @@ if __name__=='__main__':
     rospy.init_node('kinova_unity') 
     # Subscribe to incoming unity messages from rosbridge
     global outgoing_kinova
+    global outgoing_jointcmd
+    global incoming_jointcmd
+    # Publishers
     outgoing_kinova = rospy.Publisher('kinova_outgoing', String, queue_size=10)
+    outgoing_jointcmd = rospy.Publisher('outgoing_jointcmd', String, queue_size=10)
+    # Subscribers
+    incoming_jointcmd = rospy.Subscriber('/'+robot_name+'/out/joint_command', JointAngles, setCurrentState)
     incoming_unity = rospy.Subscriber('/unity_incoming', String, unity_callback)  
     robot_status = rospy.Subscriber('/'+robot_name+'/joints_action/joint_angles/result', ArmJointAnglesActionResult, outgoing_callback)
     rate = rospy.Rate(100)
