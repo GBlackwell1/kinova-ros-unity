@@ -1,3 +1,4 @@
+Development was tied to research at the University of South Carolina. Project is no longer under development after departure.
 # ADDITIONS TO THIS REPO
 There's an additional package called kinova_unity with one node called unity_comm.py. This node serves as a way to communicate to a topic spun-up by ROSBridge from the node server in a private repository. This node uses the JointAngles action server to send angular positions relative to itself. It has additional communication back to the node server of the current status of the robot and the robots current position in a string format. This contains the status uint8 and the text from the robot. Currently the only status codes we check for are ACTIVE and SUCCEEDED. Additional work will have to be done to account for all status codes. You may run the node after launching the intial stack by doing `rosrun kinova_unity unity_comm.py`.
 
